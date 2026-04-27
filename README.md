@@ -1,3 +1,5 @@
+Project URL: https://github.com/yugaimiroslav/ExpenseTracker
+
 ## How to Run
 
 ### Prerequisites
