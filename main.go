@@ -1,12 +1,13 @@
 package main
 
 import (
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"os"
+	"strconv"
 	"text/tabwriter"
 	"time"
-
 	"github.com/spf13/cobra"
 )
 
@@ -18,6 +19,7 @@ type Expense struct {
 }
 
 const fileDataName = "expenses.json"
+const fileExportName = "expenses.csv"
 
 // loadData loads data from expenses.json
 func loadData() []Expense {
@@ -31,7 +33,7 @@ func loadData() []Expense {
 }
 
 func saveData(expenses []Expense) {
-	updatedData, _ := json.MarshalIndent(expenses, " ", "    ")
+	updatedData, _ := json.MarshalIndent(expenses, "", "    ")
 	os.WriteFile(fileDataName, updatedData, 0644)
 }
 
@@ -118,6 +120,40 @@ func runSummaryCommand(cmd *cobra.Command, args []string) {
 	}
 }
 
+func runExportCommand(cmd *cobra.Command, args []string) {
+	var expenses []Expense
+	expenses = loadData()
+
+	file, err := os.Create(fileExportName)
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	writer := csv.NewWriter(file)
+	defer writer.Flush()
+
+	headingRow := []string{
+		"ID",
+		"Date",
+		"Description",
+		"Amount",
+	}
+	writer.Write(headingRow)
+	
+	for _, e := range expenses {
+		row := []string{
+			strconv.Itoa(e.ID),
+			e.Date.Format("2006-01-02"),
+			e.Description,
+			strconv.Itoa(e.Amount),
+		}
+		writer.Write(row)
+	}
+
+	fmt.Println("Data was successully exported to csv file")
+}
+
 func main() {
 	var rootCmd = &cobra.Command{
 		Use: "expense-tracker",
@@ -157,10 +193,17 @@ func main() {
 	// add flags for 'summary' command
 	summaryCmd.Flags().Int("month", 0, "month expenses")
 
+	var exportCmd = &cobra.Command{
+		Use:   "export",
+		Short: "Export all data in CSV file",
+		Run:   runExportCommand,
+	}
+
 	// add commands to the root
 	rootCmd.AddCommand(addCmd)
 	rootCmd.AddCommand(listCmd)
 	rootCmd.AddCommand(deleteCmd)
 	rootCmd.AddCommand(summaryCmd)
+	rootCmd.AddCommand(exportCmd)
 	rootCmd.Execute()
 }
