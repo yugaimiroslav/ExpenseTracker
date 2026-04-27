@@ -1,4 +1,5 @@
-[Project URL](https://github.com/yugaimiroslav/ExpenseTracker)
+## Project Url
+https://roadmap.sh/projects/expense-tracker
 
 ## How to Run
 
