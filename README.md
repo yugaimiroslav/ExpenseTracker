@@ -1,4 +1,4 @@
-Project URL: https://github.com/yugaimiroslav/ExpenseTracker
+[Project URL](https://github.com/yugaimiroslav/ExpenseTracker)
 
 ## How to Run
 
